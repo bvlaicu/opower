@@ -11,11 +11,11 @@ class Oru(ConEd):
         return "Orange & Rockland Utilities (ORU)"
 
     @staticmethod
-    def hostname() -> str:
-        """Return the hostname for this utility."""
-        return "oru.com"
-
-    @staticmethod
     def subdomain() -> str:
         """Return the opower.com subdomain for this utility."""
         return "oru"
+
+    @staticmethod
+    def hostname() -> str:
+        """Return the hostname for login."""
+        return "oru.com"

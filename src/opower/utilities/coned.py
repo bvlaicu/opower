@@ -11,6 +11,7 @@ from .base import UtilityBase
 
 RETURN_URL = "/en/accounts-billing/my-account/energy-use"
 
+
 class ConEd(UtilityBase):
     """Consolidated Edison (ConEd)."""
 
@@ -18,11 +19,6 @@ class ConEd(UtilityBase):
     def name() -> str:
         """Distinct recognizable name of the utility."""
         return "Consolidated Edison (ConEd)"
-
-    @staticmethod
-    def hostname() -> str:
-        """Return the hostname for this utility."""
-        return "coned.com"
 
     @staticmethod
     def subdomain() -> str:
@@ -39,6 +35,11 @@ class ConEd(UtilityBase):
         """Check if Utility implementations supports MFA."""
         return True
 
+    @staticmethod
+    def hostname() -> str:
+        """Return the hostname for login. Allows overriding it for oru.com."""
+        return "coned.com"
+
     @classmethod
     async def async_login(
         cls,
@@ -48,22 +49,26 @@ class ConEd(UtilityBase):
         optional_mfa_secret: Optional[str],
     ) -> str:
         """Login to the utility website."""
-
-        LOGIN_BASE = "https://www." + cls.hostname() + "/sitecore/api/ssc/ConEdWeb-Foundation-Login-Areas-LoginAPI/User/0"
-        LOGIN_HEADERS = {
+        hostname = cls.hostname()
+        login_base = (
+            "https://www."
+            + hostname
+            + "/sitecore/api/ssc/ConEdWeb-Foundation-Login-Areas-LoginAPI/User/0"
+        )
+        login_headers = {
             "User-Agent": USER_AGENT,
-            "Referer": "https://www." + cls.hostname() + "/",
+            "Referer": "https://www." + hostname + "/",
         }
 
         # Double-logins are somewhat broken if cookies stay around.
         # Let's clear everything except device tokens (which allow skipping 2FA)
         session.cookie_jar.clear(
-            lambda cookie: cookie["domain"] == "www." + cls.hostname()
+            lambda cookie: cookie["domain"] == "www." + hostname
             and cookie.key != "CE_DEVICE_ID"
         )
 
         async with session.post(
-            LOGIN_BASE + "/Login",
+            login_base + "/Login",
             json={
                 "LoginEmail": username,
                 "LoginPassword": password,
@@ -71,7 +76,7 @@ class ConEd(UtilityBase):
                 "ReturnUrl": RETURN_URL,
                 "OpenIdRelayState": "",
             },
-            headers=LOGIN_HEADERS,
+            headers=login_headers,
             raise_for_status=True,
         ) as resp:
             result = await resp.json()
@@ -92,8 +97,8 @@ class ConEd(UtilityBase):
                         mfaCode = TOTP(optional_mfa_secret).now()
 
                         async with session.post(
-                            LOGIN_BASE + "/VerifyFactor",
-                            headers=LOGIN_HEADERS,
+                            login_base + "/VerifyFactor",
+                            headers=login_headers,
                             json={
                                 "MFACode": mfaCode,
                                 "ReturnUrl": RETURN_URL,
@@ -122,7 +127,9 @@ class ConEd(UtilityBase):
                 pass
 
         async with session.get(
-            "https://www." + cls.hostname() + "/sitecore/api/ssc/ConEd-Cms-Services-Controllers-Opower/OpowerService/0/GetOPowerToken",
+            "https://www."
+            + hostname
+            + "/sitecore/api/ssc/ConEd-Cms-Services-Controllers-Opower/OpowerService/0/GetOPowerToken",
             headers={"User-Agent": USER_AGENT},
             raise_for_status=True,
         ) as resp:
