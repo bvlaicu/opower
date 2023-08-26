@@ -1,24 +1,19 @@
 """Orange & Rockland Utilities (ORU)."""
 
-from typing import Optional
-
-import aiohttp
-from pyotp import TOTP
-
-from ..const import USER_AGENT
-from ..exceptions import InvalidAuth
-from .base import UtilityBase
 from .coned import ConEd
 
-HOSTNAME = "oru.com"
-
-class Oru(ConEd, UtilityBase):
+class Oru(ConEd):
     """Orange & Rockland Utilities (ORU)."""
 
     @staticmethod
     def name() -> str:
         """Distinct recognizable name of the utility."""
         return "Orange & Rockland Utilities (ORU)"
+
+    @staticmethod
+    def hostname() -> str:
+        """Return the hostname for this utility."""
+        return "oru.com"
 
     @staticmethod
     def subdomain() -> str:
