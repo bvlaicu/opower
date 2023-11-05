@@ -94,7 +94,7 @@ class ConEd(UtilityBase):
                                 "TOTP secret is required for MFA accounts"
                             )
 
-                        mfaCode = TOTP(optional_mfa_secret).now()
+                        mfaCode = TOTP(optional_mfa_secret.strip()).now()
 
                         async with session.post(
                             login_base + "/VerifyFactor",
@@ -130,7 +130,7 @@ class ConEd(UtilityBase):
             "https://www."
             + hostname
             + "/sitecore/api/ssc/ConEd-Cms-Services-Controllers-Opower/OpowerService/0/GetOPowerToken",
-            headers={"User-Agent": USER_AGENT},
+            headers=login_headers,
             raise_for_status=True,
         ) as resp:
             return str(await resp.json())

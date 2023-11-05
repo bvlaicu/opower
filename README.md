@@ -6,6 +6,7 @@ Supported utilities:
 
 - Consolidated Edison (ConEd)
   - Orange & Rockland Utilities (ORU)
+- Enmax Energy
 - Evergy
 - Exelon subsidiaries
   - Atlantic City Electric
@@ -15,6 +16,7 @@ Supported utilities:
   - PECO Energy Company (PECO)
   - Potomac Electric Power Company (Pepco)
 - Pacific Gas & Electric (PG&E)
+- Portland General Electric (PGE)
 - Puget Sound Energy (PSE)
 
 ## Support a new utility
